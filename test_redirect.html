@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Redirects - Markeplay Notifier</title>
+  <style>
+    body { 
+      font-family: sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      line-height: 1.6;
+    }
+    h1 { color: #2563eb; }
+    .button {
+      display: inline-block;
+      background: #2563eb;
+      color: white;
+      padding: 10px 15px;
+      border-radius: 4px;
+      text-decoration: none;
+      margin: 10px 5px 10px 0;
+    }
+    .test-section {
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+    .log-section {
+      background-color: #f9fafb;
+      border-radius: 8px;
+      padding: 15px;
+      max-height: 300px;
+      overflow-y: auto;
+      border: 1px solid #e5e7eb;
+    }
+    pre {
+      margin: 0;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <h1>Test Redirects Markeplay Notifier</h1>
+  <p>Questa pagina consente di testare i diversi scenari di reindirizzamento dopo il login.</p>
+  
+  <div class="test-section">
+    <h2>Test login con localStorage</h2>
+    <p>Imposta i flag nel localStorage/sessionStorage e poi naviga.</p>
+    <button class="button" id="btnSetFlags">Imposta flag login</button>
+    <button class="button" id="btnClearFlags">Cancella flag login</button>
+    <button class="button" id="btnCheckFlags">Controlla flag login</button>
+  </div>
+  
+  <div class="test-section">
+    <h2>Test redirect diretto</h2>
+    <a href="/applications/notificationapp/" class="button">Root app (/applications/notificationapp/)</a>
+    <a href="/applications/notificationapp/notifications" class="button">Notifiche (/applications/notificationapp/notifications)</a>
+    <a href="/applications/notificationapp/?justLoggedIn=true" class="button">Root con justLoggedIn=true</a>
+  </div>
+  
+  <div class="log-section">
+    <h3>Log</h3>
+    <pre id="logArea"></pre>
+  </div>
+  
+  <script>
+    const logArea = document.getElementById('logArea');
+    
+    function log(message) {
+      const timestamp = new Date().toLocaleTimeString();
+      logArea.innerHTML += `[${timestamp}] ${message}\n`;
+      logArea.scrollTop = logArea.scrollHeight;
+    }
+    
+    // Imposta flag di login
+    document.getElementById('btnSetFlags').addEventListener('click', function() {
+      localStorage.setItem('justLoggedIn', 'true');
+      localStorage.setItem('loginTimestamp', Date.now().toString());
+      sessionStorage.setItem('justLoggedIn', 'true');
+      sessionStorage.setItem('loginTimestamp', Date.now().toString());
+      
+      // Crea anche un finto utente nel localStorage
+      const mockUser = {
+        id: 1,
+        uniqueid: 'test_user',
+        deviceToken: null,
+        stayConnected: true,
+        lastChecked: new Date().toISOString(),
+        firstName: 'Test',
+        lastName: 'User',
+        websiteTitle: 'Markeplay Test'
+      };
+      
+      localStorage.setItem('user', JSON.stringify(mockUser));
+      sessionStorage.setItem('user', JSON.stringify(mockUser));
+      
+      log('Flag di login impostati in localStorage e sessionStorage');
+      log('Mock user creato in localStorage e sessionStorage');
+    });
+    
+    // Cancella flag di login
+    document.getElementById('btnClearFlags').addEventListener('click', function() {
+      localStorage.removeItem('justLoggedIn');
+      localStorage.removeItem('loginTimestamp');
+      localStorage.removeItem('user');
+      sessionStorage.removeItem('justLoggedIn');
+      sessionStorage.removeItem('loginTimestamp');
+      sessionStorage.removeItem('user');
+      
+      log('Flag di login e dati utente rimossi da localStorage e sessionStorage');
+    });
+    
+    // Controlla flag di login
+    document.getElementById('btnCheckFlags').addEventListener('click', function() {
+      const justLoggedIn = {
+        localStorage: localStorage.getItem('justLoggedIn'),
+        sessionStorage: sessionStorage.getItem('justLoggedIn')
+      };
+      
+      const user = {
+        localStorage: localStorage.getItem('user'),
+        sessionStorage: sessionStorage.getItem('user')
+      };
+      
+      log('Flag justLoggedIn:');
+      log(JSON.stringify(justLoggedIn, null, 2));
+      
+      log('User data:');
+      log(JSON.stringify(user, null, 2));
+    });
+    
+    // Log initial state
+    window.addEventListener('load', function() {
+      log('Pagina caricata');
+      log(`URL: ${window.location.href}`);
+      log(`Hostname: ${window.location.hostname}`);
+      log(`Pathname: ${window.location.pathname}`);
+      log(`Search: ${window.location.search}`);
+    });
+  </script>
+</body>
+</html>

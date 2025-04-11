@@ -1,0 +1,13 @@
+node_modules
+dist
+dist/
+*.zip
+temp/
+temp_*/
+.replit
+.replit.nix
+.breakpoints
+.DS_Store
+server/public
+vite.config.ts.*
+*.tar.gz
